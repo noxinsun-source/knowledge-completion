@@ -1,0 +1,34 @@
+{
+  "name": "knowledge-completion",
+  "version": "1.0.0",
+  "description": "Turn notes into persistent, evidence-backed knowledge graphs and open them in the Knowledge Completion dashboard.",
+  "author": {
+    "name": "noxinsun-source",
+    "url": "https://github.com/noxinsun-source"
+  },
+  "homepage": "https://github.com/noxinsun-source/knowledge-completion/blob/main/docs/AI-INTEGRATIONS.md",
+  "repository": "https://github.com/noxinsun-source/knowledge-completion",
+  "keywords": [
+    "knowledge-graph",
+    "knowledge-completion",
+    "notes",
+    "learning"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "知识补全项目",
+    "shortDescription": "从笔记生成持久化知识网络并打开可视化面板",
+    "longDescription": "读取 Markdown 或纯文本笔记，调用知识补全 Agent Run API，保存证据、多粒度投影与知识缺口，然后返回并打开对应的 2D 知识网络页面。",
+    "developerName": "noxinsun-source",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/noxinsun-source/knowledge-completion",
+    "defaultPrompt": [
+      "请用知识补全分析我的笔记，生成知识网络并打开可视化面板。",
+      "请找出这份笔记的相邻知识与未覆盖缺口。"
+    ]
+  }
+}

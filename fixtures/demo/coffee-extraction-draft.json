@@ -1,0 +1,145 @@
+{
+  "scope": "手冲咖啡萃取与风味诊断",
+  "scopeDescription": "围绕稳定萃取、变量控制、测量与风味诊断构建的目标相对知识地图。",
+  "concepts": [
+    {
+      "name": "手冲咖啡萃取",
+      "aliases": ["Pour-over extraction"],
+      "semanticType": "domain",
+      "granularity": 1,
+      "description": "通过控制冲煮变量，使咖啡中的可溶物以可重复方式进入咖啡液。",
+      "whyItMatters": "它是理解变量、机制、测量和风味反馈的共同范围。",
+      "parentNames": [],
+      "evidence": [
+        {
+          "sourceNoteId": "note_1",
+          "excerpt": "这份笔记记录如何稳定控制手冲咖啡的萃取，并根据味道反推冲煮变量。",
+          "confidence": 0.98
+        }
+      ],
+      "confidence": 0.98,
+      "expandable": true
+    },
+    {
+      "name": "研磨度",
+      "semanticType": "mechanism",
+      "granularity": 4,
+      "description": "颗粒尺度影响可接触表面积与粉床流动阻力。",
+      "whyItMatters": "它同时影响萃取速度和流速，是主要可控变量。",
+      "parentNames": ["手冲咖啡萃取"],
+      "evidence": [
+        {
+          "sourceNoteId": "note_1",
+          "excerpt": "研磨度：颗粒越细，单位时间内可接触的表面积越大。",
+          "confidence": 0.96
+        }
+      ],
+      "confidence": 0.96,
+      "expandable": true
+    },
+    {
+      "name": "通道效应",
+      "semanticType": "mechanism",
+      "granularity": 4,
+      "description": "水从局部低阻力路径穿过粉床而导致不均匀萃取。",
+      "whyItMatters": "它解释了平均指标正常但风味仍不均衡的情况。",
+      "parentNames": ["手冲咖啡萃取"],
+      "evidence": [
+        {
+          "sourceNoteId": "note_1",
+          "excerpt": "通道效应：水从局部低阻力路径快速穿过，造成萃取不均匀。",
+          "confidence": 0.97
+        }
+      ],
+      "confidence": 0.97,
+      "expandable": true
+    },
+    {
+      "name": "萃取率",
+      "semanticType": "formula",
+      "granularity": 5,
+      "description": "从咖啡粉转移到咖啡液的物质比例。",
+      "whyItMatters": "它把感官判断连接到可测量结果。",
+      "parentNames": ["手冲咖啡萃取"],
+      "evidence": [
+        {
+          "sourceNoteId": "note_1",
+          "excerpt": "萃取率：描述从咖啡粉中转移到咖啡液的物质比例。",
+          "confidence": 0.96
+        }
+      ],
+      "confidence": 0.96,
+      "expandable": true
+    },
+    {
+      "name": "粒径分布",
+      "aliases": ["Particle size distribution"],
+      "semanticType": "mechanism",
+      "granularity": 4,
+      "description": "同一批研磨颗粒在不同尺寸区间的分布，而不仅是单一平均研磨度。",
+      "whyItMatters": "细粉和粗粉比例会改变流阻、萃取均匀性与复现性。",
+      "parentNames": ["研磨度"],
+      "evidence": [],
+      "confidence": 0.76,
+      "expandable": true
+    },
+    {
+      "name": "冲煮水化学",
+      "aliases": ["Brewing water chemistry"],
+      "semanticType": "topic",
+      "granularity": 3,
+      "description": "水中矿物离子与缓冲能力对溶解和风味表达的影响。",
+      "whyItMatters": "笔记覆盖了水温，但尚未覆盖水质这一重要变量。",
+      "parentNames": ["手冲咖啡萃取"],
+      "evidence": [],
+      "confidence": 0.74,
+      "expandable": true
+    },
+    {
+      "name": "旁路水",
+      "aliases": ["Bypass"],
+      "semanticType": "method",
+      "granularity": 4,
+      "description": "未穿过咖啡粉床、直接进入最终饮品的水。",
+      "whyItMatters": "它会改变浓度与萃取率之间的解释关系。",
+      "parentNames": ["手冲咖啡萃取"],
+      "evidence": [],
+      "confidence": 0.71,
+      "expandable": false
+    }
+  ],
+  "relations": [
+    {
+      "sourceName": "粒径分布",
+      "targetName": "研磨度",
+      "relation": "part_of",
+      "statement": "粒径分布是比单一研磨刻度更细的研磨描述。",
+      "evidence": [],
+      "confidence": 0.75
+    },
+    {
+      "sourceName": "粒径分布",
+      "targetName": "通道效应",
+      "relation": "enables",
+      "statement": "不均匀的粒径分布可能增加局部流阻差异并促进通道形成。",
+      "evidence": [],
+      "confidence": 0.69
+    },
+    {
+      "sourceName": "冲煮水化学",
+      "targetName": "萃取率",
+      "relation": "enables",
+      "statement": "水中矿物组成会影响可溶物提取与风味表达。",
+      "evidence": [],
+      "confidence": 0.72
+    },
+    {
+      "sourceName": "旁路水",
+      "targetName": "萃取率",
+      "relation": "contrasts_with",
+      "statement": "旁路水改变饮品浓度，但不直接增加通过粉床完成的萃取。",
+      "evidence": [],
+      "confidence": 0.7
+    }
+  ]
+}

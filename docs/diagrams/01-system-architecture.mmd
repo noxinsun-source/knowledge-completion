@@ -1,0 +1,57 @@
+flowchart RL
+  subgraph PRODUCT["产品思路 · WHY"]
+    direction TB
+    P1["地图不是唯一真理<br/>必须有目标、边界与版本"]
+    P2["从一张笔记开始<br/>降低探索启动成本"]
+    P3["围绕中心逐跳扩散<br/>保持上下文与认知秩序"]
+    P4["收藏不等于理解<br/>分开覆盖、深度与掌握"]
+    P5["缺口必须可行动<br/>给出下一步而非焦虑清单"]
+    P6["每个亮点都要可解释<br/>能够回到原始证据"]
+    P7["产品需要持续演进<br/>数据、算法与界面解耦"]
+    P1 ~~~ P2 ~~~ P3 ~~~ P4 ~~~ P5 ~~~ P6 ~~~ P7
+  end
+
+  subgraph CAPABILITY["产品能力 · WHAT"]
+    direction TB
+    C1["版本化知识分母"]
+    C2["笔记—概念证据对齐"]
+    C3["一跳/二跳知识网络"]
+    C4["多维覆盖状态"]
+    C5["缺口优先级队列"]
+    C6["证据卡片与详情窗"]
+    C7["统一领域协议与分层架构"]
+    C1 ~~~ C2 ~~~ C3 ~~~ C4 ~~~ C5 ~~~ C6 ~~~ C7
+  end
+
+  subgraph TECH["技术原理 · HOW"]
+    direction TB
+    T1["ATLAS_SCOPE_VERSION<br/>版本化节点与关系目录"]
+    T2["NFKC 规范化 + 别名/关键词<br/>证据片段与可解释评分"]
+    T3["确定性力导向布局<br/>斥力 + 弹簧 + 径向约束"]
+    T4["topic / weighted / depth / structural<br/>四类覆盖指标"]
+    T5["priority = 未覆盖程度 × 概念权重<br/>结合前置关系排序"]
+    T6["D1 持久化 + SHA-256 去重<br/>prepared statements + provenance"]
+    T7["Contracts → Engine → API → UI<br/>类型边界、CI 与迁移"]
+    T1 ~~~ T2 ~~~ T3 ~~~ T4 ~~~ T5 ~~~ T6 ~~~ T7
+  end
+
+  T1 -->|实现| C1 -->|支撑| P1
+  T2 -->|实现| C2 -->|支撑| P2
+  T3 -->|实现| C3 -->|支撑| P3
+  T4 -->|实现| C4 -->|支撑| P4
+  T5 -->|实现| C5 -->|支撑| P5
+  T6 -->|实现| C6 -->|支撑| P6
+  T7 -->|实现| C7 -->|支撑| P7
+
+  T1 -.->|限定候选概念| C2
+  T2 -.->|提供节点权重输入| C4
+  T6 -.->|提供证据与来源| C5
+  T7 -.->|保证能力可替换| C3
+  P1 -.->|产品边界反向约束| T1
+
+  classDef product fill:#16231d,stroke:#71c69b,color:#e8f3ed,stroke-width:2px;
+  classDef capability fill:#1b2027,stroke:#8ca9dc,color:#edf2fb,stroke-width:2px;
+  classDef tech fill:#28231a,stroke:#d0b672,color:#f5f0e4,stroke-width:2px;
+  class P1,P2,P3,P4,P5,P6,P7 product;
+  class C1,C2,C3,C4,C5,C6,C7 capability;
+  class T1,T2,T3,T4,T5,T6,T7 tech;

@@ -1,0 +1,4 @@
+interface:
+  display_name: "知识补全"
+  short_description: "从任意笔记生成持久化多粒度知识网络并打开面板"
+  default_prompt: "Use $knowledge-completion to persist a multi-granularity graph from my note and open its dashboard."

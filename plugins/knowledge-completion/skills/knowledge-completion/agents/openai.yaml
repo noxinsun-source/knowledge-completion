@@ -1,0 +1,4 @@
+interface:
+  display_name: "知识补全"
+  short_description: "从笔记生成持久化知识网络并打开交互式可视化产品面板"
+  default_prompt: "Use $knowledge-completion to complete adjacent knowledge from my note and open the visual dashboard."

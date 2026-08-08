@@ -1,0 +1,45 @@
+name: 功能建议
+description: 从用户问题出发提出产品或技术能力
+title: "[Feature]: "
+labels: ["enhancement", "triage"]
+body:
+  - type: textarea
+    id: user_problem
+    attributes:
+      label: 用户问题
+      description: 用户现在无法完成什么？请避免只写“增加某技术”。
+    validations:
+      required: true
+  - type: textarea
+    id: product_loop
+    attributes:
+      label: 它处于哪个产品闭环？
+      description: 选择笔记、概念对齐、逐跳扩散、证据查看、缺口行动、重新计算，或新的闭环。
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 建议方案
+      description: 描述交互、数据来源、技术原理和失败模式。
+    validations:
+      required: true
+  - type: dropdown
+    id: truth
+    attributes:
+      label: 数据/能力性质
+      options:
+        - 真实运行能力
+        - 策展数据
+        - Demo 数据
+        - 研究性实验
+        - 不确定
+    validations:
+      required: true
+  - type: textarea
+    id: success
+    attributes:
+      label: 成功标准
+      description: 如何证明功能真的解决了问题？
+    validations:
+      required: true

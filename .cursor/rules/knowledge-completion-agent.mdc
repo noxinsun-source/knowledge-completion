@@ -1,0 +1,10 @@
+---
+description: Use the Knowledge Completion Agent when the user asks to build and persist a multi-granularity graph, find adjacent concepts, expose gaps, analyze notes, or open a visual knowledge network. Read skills/knowledge-completion/SKILL.md and prefer the Run API dashboard workflow.
+alwaysApply: false
+---
+
+# Knowledge Completion Agent
+
+When this rule is relevant, read [`skills/knowledge-completion/SKILL.md`](../../skills/knowledge-completion/SKILL.md) before acting.
+
+Prefer the bundled `submit-run.mjs` helper so the result receives a durable `runId` and opens at `/runs/:runId`. Use the repository CLI only as a non-visual fallback. Keep note evidence, model proposals, and external evidence separate. Never mark an unsupported adjacent concept as covered or understood. Report the provider, graph counts, projection counts, stop reason, warnings, boundary concepts, and dashboard URL.

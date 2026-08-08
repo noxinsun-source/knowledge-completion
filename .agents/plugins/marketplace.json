@@ -1,0 +1,20 @@
+{
+  "name": "knowledge-completion",
+  "interface": {
+    "displayName": "知识补全项目"
+  },
+  "plugins": [
+    {
+      "name": "knowledge-completion",
+      "source": {
+        "source": "local",
+        "path": "./plugins/knowledge-completion"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

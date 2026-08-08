@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="MindTrace">
+  <rect width="512" height="512" rx="112" fill="#f5f2eb"/>
+  <path d="M126 326V186c0-33 27-60 60-60h140c33 0 60 27 60 60v140c0 33-27 60-60 60H186c-33 0-60-27-60-60Z" fill="#fffdf8" stroke="#18352a" stroke-width="22"/>
+  <path d="M187 305V207l69 65 69-65v98" fill="none" stroke="#0b8f55" stroke-linecap="round" stroke-linejoin="round" stroke-width="28"/>
+  <circle cx="256" cy="272" r="20" fill="#18352a"/>
+</svg>

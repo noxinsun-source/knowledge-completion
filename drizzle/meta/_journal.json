@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1786153683728,
+      "tag": "0000_nebulous_roughhouse",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1786171190855,
+      "tag": "0001_puzzling_khan",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1786210000000,
+      "tag": "0002_knowledge_agent_runs",
+      "breakpoints": true
+    }
+  ]
+}
