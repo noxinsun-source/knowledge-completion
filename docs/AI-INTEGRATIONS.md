@@ -40,7 +40,7 @@ Plugin 内的 `scripts/submit-run.mjs` 是真实可执行的 Node.js 客户端�
 6. 通过 `GET /api/runs/:runId` 回读并比较持久化结果；
 7. 打印 `runId`、`dashboardUrl`、`eventsUrl`，并尝试打开 `/runs/:runId`。
 
-Plugin 不声明 MCP 服务器，也不假装已经存在公网 SaaS。首次使用时，如果定位到的 runtime 尚无依赖，helper 会明确报错。用户确认下载依赖后，可使用 `--install-dependencies`。如果面板已经部署，设置可信的 `KNOWLEDGE_COMPLETION_BASE_URL` 即可不启动本地 runtime；非本机地址还必须显式传入 `--allow-remote-upload`，因为请求包含完整笔记正文。
+Plugin 不声明 MCP 服务器，也不假装已经存在公网 SaaS。首次使用时，如果既没有服务也没有 runtime，helper 会明确报错。用户确认固定版本 Git 克隆和依赖下载后，宿主可使用 `--bootstrap-runtime --install-dependencies`：它只克隆与 Plugin 匹配的 release tag，验证 package/plugin 双重身份，不覆盖已有目录，然后安装并启动。如果面板已经部署，设置可信的 `KNOWLEDGE_COMPLETION_BASE_URL` 即可不启动本地 runtime；非本机地址还必须显式传入 `--allow-remote-upload`，因为请求包含完整笔记正文。
 
 ## Codex 仓库级 Skill
 

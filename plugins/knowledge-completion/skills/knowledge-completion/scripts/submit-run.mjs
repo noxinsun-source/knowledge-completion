@@ -1,11 +1,14 @@
 #!/usr/bin/env node
 
 import { spawn } from "node:child_process";
-import { access, readFile } from "node:fs/promises";
+import { access, mkdir, readFile } from "node:fs/promises";
+import { homedir } from "node:os";
 import { basename, dirname, extname, join, parse, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const DEFAULT_BASE_URL = "http://localhost:4318";
+const RUNTIME_VERSION = "1.0.1";
+const RUNTIME_GIT_URL = "https://github.com/noxinsun-source/knowledge-completion.git";
 const EXPECTED_HEALTH = Object.freeze({
   ok: true,
   service: "knowledge-completion-api",
@@ -37,6 +40,7 @@ Options:
   --base-url <url>          Product origin; defaults to KNOWLEDGE_COMPLETION_BASE_URL or ${DEFAULT_BASE_URL}
   --allow-remote-upload     Explicitly allow note text to leave this machine
   --runtime-root <path>     Full knowledge-completion checkout to start when needed
+  --bootstrap-runtime      Clone the pinned v${RUNTIME_VERSION} runtime when no checkout exists
   --install-dependencies    Run npm install in a detected runtime when dependencies are absent
   --no-start                Do not start a detected local runtime
   --no-open                 Return the dashboard URL without opening a browser
@@ -89,6 +93,7 @@ function parseArgs(argv) {
     if (argument === "--base-url") { options.baseUrl = requireValue(argv, index, argument); index += 1; continue; }
     if (argument === "--allow-remote-upload") { options.allowRemoteUpload = true; continue; }
     if (argument === "--runtime-root") { options.runtimeRoot = requireValue(argv, index, argument); index += 1; continue; }
+    if (argument === "--bootstrap-runtime") { options.bootstrapRuntime = true; continue; }
     if (argument === "--wait-seconds") { options.waitSeconds = numberInRange(requireValue(argv, index, argument), argument, 5, 120, { integer: true }); index += 1; continue; }
     if (argument === "--install-dependencies") { options.installDependencies = true; continue; }
     if (argument === "--no-start") { options.shouldStart = false; continue; }
@@ -187,7 +192,35 @@ function ancestorPaths(seed) {
   }
 }
 
-async function findRuntimeRoot(explicitRoot) {
+function defaultBootstrapRoot() {
+  return join(homedir(), ".local", "share", "knowledge-completion", "runtime", RUNTIME_VERSION);
+}
+
+async function bootstrapRuntime() {
+  const target = defaultBootstrapRoot();
+  if (await fileExists(target)) {
+    if (!await isRuntimeRoot(target)) {
+      throw new Error(`Bootstrap destination ${target} already exists but is not a verified Knowledge Completion runtime. Move it aside or set --runtime-root to a trusted checkout; the helper will not overwrite it.`);
+    }
+    return target;
+  }
+  await mkdir(dirname(target), { recursive: true });
+  process.stderr.write(`Cloning pinned Knowledge Completion runtime v${RUNTIME_VERSION} into ${target}...\n`);
+  await runProcess("git", [
+    "clone",
+    "--depth", "1",
+    "--branch", `v${RUNTIME_VERSION}`,
+    "--single-branch",
+    RUNTIME_GIT_URL,
+    target,
+  ], { stdio: "inherit", env: process.env });
+  if (!await isRuntimeRoot(target)) {
+    throw new Error(`The cloned runtime at ${target} failed package and plugin identity verification.`);
+  }
+  return target;
+}
+
+async function findRuntimeRoot(explicitRoot, allowBootstrap) {
   const configuredRoot = explicitRoot || process.env.KNOWLEDGE_COMPLETION_ROOT;
   if (configuredRoot) {
     const candidate = resolve(configuredRoot);
@@ -199,6 +232,7 @@ async function findRuntimeRoot(explicitRoot) {
   for (const candidate of ancestorPaths(dirname(SCRIPT_PATH))) {
     if (await isRuntimeRoot(candidate)) return candidate;
   }
+  if (allowBootstrap) return bootstrapRuntime();
   return undefined;
 }
 
@@ -278,8 +312,8 @@ async function ensureService(options, baseUrl) {
   if (probe.state === "incompatible") throw new Error(probe.detail);
   if (!options.shouldStart) throw new Error(`Knowledge Completion API is unavailable at ${baseUrl.origin}. Start the product runtime or remove --no-start.`);
   if (!isLocalRuntimeUrl(baseUrl)) throw new Error(`Cannot automatically start non-local service ${baseUrl.origin}. Verify KNOWLEDGE_COMPLETION_BASE_URL and start that trusted deployment.`);
-  const runtimeRoot = await findRuntimeRoot(options.runtimeRoot);
-  if (!runtimeRoot) throw new Error("Knowledge Completion API is unavailable and no full knowledge-completion checkout was found. Clone https://github.com/noxinsun-source/knowledge-completion, install its dependencies, then set KNOWLEDGE_COMPLETION_ROOT or start npm run dev there.");
+  const runtimeRoot = await findRuntimeRoot(options.runtimeRoot, options.bootstrapRuntime);
+  if (!runtimeRoot) throw new Error("Knowledge Completion API is unavailable and no verified runtime was found. After approving a pinned Git clone and dependency download, rerun with --bootstrap-runtime --install-dependencies; alternatively clone the repository yourself and set KNOWLEDGE_COMPLETION_ROOT.");
   await ensureDependencies(runtimeRoot, options.installDependencies);
   process.stderr.write(`Starting Knowledge Completion runtime from ${runtimeRoot}...\n`);
   startRuntime(runtimeRoot);

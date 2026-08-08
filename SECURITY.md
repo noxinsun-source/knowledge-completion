@@ -43,6 +43,7 @@
 - Agent 同步运行限制笔记数量、总字符数、候选概念数、关系数和最终节点数；
 - 浏览器 HTTP 入口不接收模型 API Key，CLI 仅从环境变量读取凭据；
 - Plugin helper 验证服务身份、同源 dashboard URL 和持久化回读；远程全文上传必须显式确认。
+- 首次 runtime bootstrap 只有在显式参数下运行，克隆与 Plugin 版本绑定的 tag、执行双清单校验，并拒绝覆盖已有目的目录。
 
 ## 已知待补安全能力
 

@@ -117,7 +117,15 @@ $knowledge-completion 请读取 /absolute/path/my-note.md，
   → 返回并打开 /runs/:runId
 ```
 
-Plugin 内置的是 **Skill + 严格 HTTP 客户端**，不是虚构的 SaaS 或 MCP 服务。它会优先连接 `KNOWLEDGE_COMPLETION_BASE_URL`，默认是 `http://localhost:4318`；当本地服务没有启动时，它只会从经过双重清单校验的完整仓库启动 runtime。若依赖不存在，它会停下并要求用户确认，只有显式添加 `--install-dependencies` 才会在该仓库运行 `npm install`。
+Plugin 内置的是 **Skill + 严格 HTTP 客户端**，不是虚构的 SaaS 或 MCP 服务。它会优先连接 `KNOWLEDGE_COMPLETION_BASE_URL`，默认是 `http://localhost:4318`；当本地服务没有启动时，它只会从经过双重清单校验的完整仓库启动 runtime。
+
+如果机器上连完整仓库也没有，Skill 会先向用户说明将要发生的 Git 克隆和 npm 下载。得到同意后，它才会增加：
+
+```bash
+--bootstrap-runtime --install-dependencies
+```
+
+helper 会克隆与 Plugin 版本匹配的固定 Git tag 到版本化用户数据目录，校验 package 与 plugin 两份身份，再安装、启动并等待健康检查。已有目录绝不会被覆盖。因而“安装 Plugin → 提交笔记 → 得到 runId → 打开页面”可以在一次任务内完成，同时不会偷偷执行仓库脚本。
 
 如果 Plugin 安装缓存不包含完整 runtime，请先执行“1.2 启动完整产品”，或设置：
 
@@ -416,6 +424,7 @@ knowledge-completion/
 --draft <path>            可选 AgentGraphDraft
 --base-url <url>          产品服务地址
 --runtime-root <path>     经过清单校验的完整仓库
+--bootstrap-runtime      经用户同意后克隆与 Plugin 版本绑定的 runtime
 --allow-remote-upload     明确允许把笔记全文发往远程服务
 --install-dependencies    明确允许在 runtime 安装依赖
 --no-start                不自动启动本地服务
@@ -484,7 +493,7 @@ Run 已保存 canonical graph 和五级 projection。切换粒度只选择另一
 
 ### Plugin 安装后为什么仍要 runtime？
 
-Plugin 是 AI 编排和客户端分发单元；持久化 D1、API 与 React 产品页属于完整 runtime。这样能让同一个 Plugin 连接本地、自托管或未来受控服务，而不把大型前后端和用户数据悄悄塞进 AI 配置目录。
+Plugin 是 AI 编排和客户端分发单元；持久化 D1、API 与 React 产品页属于完整 runtime。首次使用可在用户确认后由 `--bootstrap-runtime --install-dependencies` 自动准备固定版本，也可以连接用户自己的 checkout 或受控服务。大型依赖和用户数据不会在未确认时被悄悄写入 AI 配置目录。
 
 ## 15. 开源治理
 

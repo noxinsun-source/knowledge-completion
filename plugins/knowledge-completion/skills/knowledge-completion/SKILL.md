@@ -41,10 +41,7 @@ The helper connects to `KNOWLEDGE_COMPLETION_BASE_URL`, defaulting to `http://lo
 
 If the helper says runtime dependencies are absent, tell the user which runtime root it found. Only after the user agrees to the dependency download, rerun with `--install-dependencies`; this executes `npm install --no-audit --no-fund` in that exact repository and then starts the service.
 
-If no runtime can be found, do one of the following:
-
-- Ask the user to clone `https://github.com/noxinsun-source/knowledge-completion`, run `npm install`, and set `KNOWLEDGE_COMPLETION_ROOT` to that checkout.
-- Connect to an already deployed instance by setting `KNOWLEDGE_COMPLETION_BASE_URL=https://...`.
+If no runtime can be found, ask the user to approve both the pinned Git clone and the npm dependency download. After approval, rerun the same command with `--bootstrap-runtime --install-dependencies`. The helper clones the Plugin-matched release tag into a versioned user-data directory, verifies both package identities, installs there, and starts it. It never overwrites an existing destination. Alternatively, connect to a trusted deployed instance by setting `KNOWLEDGE_COMPLETION_BASE_URL=https://...` and explicitly allow the remote text upload.
 
 Do not imply that the plugin contains an MCP server or hosted SaaS endpoint. It currently packages a Skill and an HTTP client; the dashboard runtime is the repository application or a separately deployed instance.
 

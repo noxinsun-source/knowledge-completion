@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
+import { readFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import { dirname, resolve } from "node:path";
 import test from "node:test";
@@ -68,6 +69,17 @@ test("plugin helper rejects fractional integer options before contacting a servi
   ]);
   assert.equal(response.code, 1);
   assert.match(response.stderr, /--granularity must be an integer/);
+});
+
+test("plugin helper exposes only an explicit version-pinned runtime bootstrap", async () => {
+  const response = await runHelper(["--help"]);
+  const source = await readFile(helper, "utf8");
+  assert.equal(response.code, 0);
+  assert.match(response.stdout, /--bootstrap-runtime/);
+  assert.match(source, /const RUNTIME_VERSION = "1\.0\.1"/);
+  assert.match(source, /"--branch", `v\$\{RUNTIME_VERSION\}`/);
+  assert.match(source, /already exists but is not a verified Knowledge Completion runtime/);
+  assert.doesNotMatch(source, /\.codex\/.+marketplace/);
 });
 
 test("plugin helper verifies the service identity instead of trusting any healthy endpoint", async () => {

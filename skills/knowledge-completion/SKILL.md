@@ -38,7 +38,7 @@ node plugins/knowledge-completion/skills/knowledge-completion/scripts/submit-run
 
 The helper checks the service identity, calls `POST /api/runs`, then performs `GET /api/runs/:runId` and compares the stored result before printing `runId` and `dashboardUrl`. It opens `/runs/:runId` by default. Require both values before reporting success. Use `KNOWLEDGE_COMPLETION_BASE_URL` only for a trusted service; a non-local endpoint additionally requires explicit `--allow-remote-upload` because it receives complete note text.
 
-If the runtime is unavailable, do not run an install silently. After the user approves the dependency download, rerun with `--install-dependencies`, or ask them to start `npm run dev` in the verified repository root. The plugin declares no MCP server or public SaaS.
+If the runtime is unavailable, do not clone or install silently. After the user approves both the pinned Git clone and dependency download, rerun with `--bootstrap-runtime --install-dependencies`. The helper clones the Plugin-matched release into a versioned user-data directory, verifies it, installs there, and starts it without overwriting existing content. A user-provided checkout may instead be passed with `--runtime-root`. The plugin declares no MCP server or public SaaS.
 
 ## CLI fallback
 
