@@ -9,6 +9,8 @@
   <img alt="License" src="https://img.shields.io/badge/License-MIT-59636E">
 </p>
 
+> 准备提交、答辩或现场演示？请先阅读 **[评委评审与本地运行指南](START-HERE-评审指南.md)**，其中包含源码包下载、8 分钟跑通、密集图谱复现和验收清单。
+
 ![知识补全真实三跳 Agent Run 页面：30 个节点与 65 条关系](public/readme-agent-run-dense.jpg)
 
 <p align="center"><sub>真实持久化三跳 Run：Plugin / Skill 提交笔记与宿主 AI 草稿后生成唯一 runId，页面从 D1 回读 30 个节点、65 条关系和五级投影；亮点表示逐字可核验的笔记证据，灰点表示尚未覆盖的相邻知识。</sub></p>
