@@ -1,6 +1,6 @@
 {
   "name": "knowledge-completion",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Persistent, evidence-backed knowledge completion with an interactive multi-granularity graph.",
   "private": true,
   "engines": {

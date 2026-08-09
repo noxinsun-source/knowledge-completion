@@ -7,7 +7,7 @@ import { basename, dirname, extname, join, parse, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const DEFAULT_BASE_URL = "http://localhost:4318";
-const RUNTIME_VERSION = "1.0.1";
+const RUNTIME_VERSION = "1.0.2";
 const RUNTIME_GIT_URL = "https://github.com/noxinsun-source/knowledge-completion.git";
 const EXPECTED_HEALTH = Object.freeze({
   ok: true,

@@ -76,7 +76,7 @@ test("plugin helper exposes only an explicit version-pinned runtime bootstrap", 
   const source = await readFile(helper, "utf8");
   assert.equal(response.code, 0);
   assert.match(response.stdout, /--bootstrap-runtime/);
-  assert.match(source, /const RUNTIME_VERSION = "1\.0\.1"/);
+  assert.match(source, /const RUNTIME_VERSION = "1\.0\.2"/);
   assert.match(source, /"--branch", `v\$\{RUNTIME_VERSION\}`/);
   assert.match(source, /already exists but is not a verified Knowledge Completion runtime/);
   assert.doesNotMatch(source, /\.codex\/.+marketplace/);

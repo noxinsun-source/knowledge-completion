@@ -1,10 +1,37 @@
 @import "tailwindcss";
 
 :root {
-  --background: #05080d;
-  --foreground: #edf3ef;
-  --mt-sans: var(--font-geist-sans), "PingFang SC", "Microsoft YaHei", sans-serif;
-  --mt-serif: "Songti SC", "STSong", "Noto Serif CJK SC", serif;
+  color-scheme: light;
+
+  /* 明晰 Demo 5.0 — semantic product tokens */
+  --mwb-bg: #f3efe8;
+  --mwb-bg-2: #ebe4da;
+  --mwb-card: #fffdf9;
+  --mwb-ink: #1c1a17;
+  --mwb-muted: #6f675c;
+  --mwb-line: rgba(40, 32, 24, 0.1);
+  --mwb-rose: #e8cfc4;
+  --mwb-rose-deep: #c98974;
+  --mwb-peach: #f0d5c4;
+  --mwb-green: #2f7d57;
+  --mwb-blue: #3d6ea5;
+  --mwb-dark: #12141a;
+  --mwb-warning: #8a4b12;
+  --mwb-warning-bg: #f3e5d4;
+  --mwb-danger: #8b2e3a;
+  --mwb-danger-bg: #f3e0e3;
+  --mwb-missing: #928b83;
+  --mwb-missing-bg: #eeeae5;
+  --mwb-shadow-sm: 0 8px 24px rgba(60, 40, 20, 0.06);
+  --mwb-shadow-md: 0 16px 36px rgba(60, 40, 20, 0.08);
+  --mwb-shadow-lg: 0 22px 60px rgba(65, 45, 28, 0.08);
+  --mwb-shadow-paper: 0 24px 70px rgba(65, 46, 31, 0.1);
+
+  --background: var(--mwb-bg);
+  --foreground: var(--mwb-ink);
+  --mt-sans: "DM Sans", var(--font-geist-sans), "PingFang SC", "Noto Sans SC", sans-serif;
+  --mt-serif: "Instrument Serif", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
+  --mt-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
 @theme inline {
@@ -23,10 +50,22 @@ body {
 }
 
 body {
-  background: var(--background);
+  background:
+    radial-gradient(1200px 500px at 10% -10%, #f7e7dc 0%, transparent 55%),
+    radial-gradient(900px 420px at 90% 0%, #e7eef5 0%, transparent 50%),
+    var(--background);
   color: var(--foreground);
   font-family: var(--mt-sans);
 }
 
 button,
 a { -webkit-tap-highlight-color: transparent; }
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--mwb-rose-deep) 62%, transparent);
+  outline-offset: 2px;
+}

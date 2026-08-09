@@ -1,6 +1,6 @@
 {
   "name": "knowledge-completion",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Turn notes into persistent, evidence-backed knowledge graphs and open them in the Knowledge Completion dashboard.",
   "author": {
     "name": "noxinsun-source",
