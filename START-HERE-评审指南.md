@@ -233,10 +233,9 @@ GitHub Actions 也会在每次推送后执行同一套主要验证。CI 页面�
 
 ```bash
 codex plugin marketplace add noxinsun-source/knowledge-completion --ref main
-codex plugin add knowledge-completion@knowledge-completion
 ```
 
-新建 Codex 任务后可以输入：
+该命令负责添加并跟踪 marketplace。随后在 ChatGPT / Codex 桌面的 **Plugins Directory** 中选择该 marketplace，安装“知识补全项目”。新建 Codex 任务后可以输入：
 
 ```text
 $knowledge-completion 请读取 /absolute/path/my-note.md，

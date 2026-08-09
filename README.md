@@ -97,10 +97,9 @@ node plugins/knowledge-completion/skills/knowledge-completion/scripts/submit-run
 
 ```bash
 codex plugin marketplace add noxinsun-source/knowledge-completion --ref main
-codex plugin add knowledge-completion@knowledge-completion
 ```
 
-安装后新建一个 Codex 任务并输入：
+该命令负责添加并跟踪 marketplace。随后在 ChatGPT / Codex 桌面的 **Plugins Directory** 中选择该 marketplace，安装“知识补全项目”，并在新任务中输入：
 
 ```text
 $knowledge-completion 请读取 /absolute/path/my-note.md，

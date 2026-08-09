@@ -20,10 +20,9 @@ Knowledge Completion 采用“可安装 Codex Plugin + 通用 Agent Skill + 真�
 
 ```bash
 codex plugin marketplace add noxinsun-source/knowledge-completion --ref main
-codex plugin add knowledge-completion@knowledge-completion
 ```
 
-第一条命令添加仓库 marketplace；第二条安装 `.agents/plugins/marketplace.json` 中声明的 `knowledge-completion` Plugin。安装后新建 Codex 任务，调用：
+该命令添加并跟踪仓库 marketplace。随后在 ChatGPT / Codex 桌面的 **Plugins Directory** 中选择该 marketplace，安装 `.agents/plugins/marketplace.json` 中声明的 `knowledge-completion` Plugin。安装后新建 Codex 任务，调用：
 
 ```text
 $knowledge-completion 请分析 notes/my-note.md，
