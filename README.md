@@ -9,7 +9,9 @@
   <img alt="License" src="https://img.shields.io/badge/License-MIT-59636E">
 </p>
 
-![知识补全产品界面](public/og-v2.png)
+![知识补全真实 Agent Run 页面](public/readme-agent-run.jpg)
+
+<p align="center"><sub>真实运行截图：Plugin 提交笔记后生成唯一 runId，页面从 D1 回读已持久化的多粒度知识图谱；亮点表示已有证据，灰点表示尚未覆盖的知识边界。</sub></p>
 
 知识补全不是一张预先写死的“标准答案知识树”。它把地图定义成：**在某个用户目标、受众、粒度、扩展跳数、节点预算和证据阈值下，对当前输入笔记所做的一次可审计建模**。
 
