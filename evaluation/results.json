@@ -1,0 +1,138 @@
+{
+  "feature": "knowledge-completion",
+  "name": "知识补全（知识扩散）",
+  "generatedAt": "2026-08-27T03:20:19.496Z",
+  "passed": 9,
+  "total": 9,
+  "ratio": 1,
+  "maturityLevel": "L3（成熟）",
+  "realModel": {
+    "provider": "openai-compatible:deepseek-chat",
+    "note": "fixtures/demo/coffee-extraction.md",
+    "result": {
+      "conceptCount": 24,
+      "relationCount": 52,
+      "evidenceCount": 23,
+      "status": "completed",
+      "modelCalls": 3
+    },
+    "note2": "以上为 2026-08 实测的 DeepSeek deepseek-chat 端到端结果；benchmark 本身不调用外部 API，保证离线可复现。"
+  },
+  "metrics": [
+    {
+      "id": "evidence-traceability",
+      "principle": "证据可追溯：excerpt 必须逐字存在于笔记",
+      "name": "证据逐字命中率",
+      "method": "heuristic 分析真实笔记后，逐条校验证据 excerpt 是否为笔记原文子串",
+      "value": "证据节点 25/25；逐字命中 true",
+      "threshold": "带证据的 excerpt 100% 逐字命中",
+      "pass": true,
+      "level": "L2"
+    },
+    {
+      "id": "evidence-strictness",
+      "principle": "证据可追溯 + 无来源概念保持边界",
+      "name": "伪造证据降级",
+      "method": "注入伪造 excerpt，校验编译后证据 sourceType 被降级为 model（不是 note）",
+      "value": "伪造证据 sourceType=model；概念 coverage=missing",
+      "threshold": "伪造 excerpt 不产生 note 级证据",
+      "pass": true,
+      "level": "L2"
+    },
+    {
+      "id": "bounded-expansion",
+      "principle": "有界扩散：maxNodes 预算 + 1–3 跳 + 停止原因",
+      "name": "知识扩散有界性",
+      "method": "用确定性 mock provider 扩散，校验节点数 ≤ maxNodes、最大深度 ≤ radius+1、trace 记录停止原因",
+      "value": "节点 12/12；最大深度 1/4；停止原因 [max-nodes-reached]",
+      "detail": {
+        "withinBudget": true,
+        "depthBounded": true,
+        "stopReasons": [
+          "max-nodes-reached"
+        ],
+        "rounds": 3,
+        "modelCalls": 2
+      },
+      "threshold": "节点 ≤ 预算 且 深度 ≤ radius+1 且 有 trace",
+      "pass": true,
+      "level": "L2"
+    },
+    {
+      "id": "gap-identification",
+      "principle": "缺口识别：无笔记证据的相邻知识保持灰色边界",
+      "name": "边界节点识别",
+      "method": "用确定性 mock 提供「有证据」与「无证据」两类概念，校验编译后 seed / boundary 与证据严格对应",
+      "value": "seed 1（均有证据 true）；boundary 1（均无证据 true）",
+      "threshold": "seed>0 且 boundary>0 且证据对应关系正确",
+      "pass": true,
+      "level": "L3"
+    },
+    {
+      "id": "projection-determinism",
+      "principle": "五级投影：粒度切换不重新调用模型，确定性折叠/展开",
+      "name": "五级投影确定性与单调性",
+      "method": "对同一 canonical graph 计算 5 级投影两次并比对，校验节点数随粒度单调不减",
+      "value": "节点数 [1, 4, 18, 23, 25]；确定性 true；单调 true；覆盖 [0.7, 0.614, 0.778, 0.717, 0.7]",
+      "detail": {
+        "counts": [
+          1,
+          4,
+          18,
+          23,
+          25
+        ],
+        "coverages": [
+          0.7,
+          0.614,
+          0.778,
+          0.717,
+          0.7
+        ]
+      },
+      "threshold": "确定性 + 单调性 均为 true",
+      "pass": true,
+      "level": "L2"
+    },
+    {
+      "id": "concept-normalization",
+      "principle": "概念规范化：别名解析为同一 canonical concept",
+      "name": "概念规范化去重",
+      "method": "normalizeConceptName 对空格/连字符/全半角等变体做 NFKC+小写+去标点归一",
+      "value": "中文变体合并 true；英文变体合并 true；跨语言区分 true",
+      "threshold": "同语言变体合并",
+      "pass": true,
+      "level": "L2"
+    },
+    {
+      "id": "mapspec-bounds",
+      "principle": "MapSpec 固定解释边界",
+      "name": "MapSpec 越界钳制",
+      "method": "validateMapSpec 对越界粒度/跳数/节点/阈值做 clamp",
+      "value": "granularity 5/5；radius 3/3；maxNodes 60/60；阈值 0.95/0.95",
+      "threshold": "越界值被钳制到边界",
+      "pass": true,
+      "level": "L2"
+    },
+    {
+      "id": "coverage-states",
+      "principle": "覆盖/深度/掌握分离：图上亮点只表示「存在来源证据」",
+      "name": "覆盖三态区分",
+      "method": "编译三个证据数量不同的概念，校验 covered / partial / missing 三态正确",
+      "value": "covered=covered；partial=partial；missing=missing",
+      "threshold": "三态与证据数量一致",
+      "pass": true,
+      "level": "L3"
+    },
+    {
+      "id": "run-contract",
+      "principle": "每次调用唯一 runId + 持久化图谱 + 五级投影",
+      "name": "Run 契约结构",
+      "method": "运行后校验 runId 格式、5 级投影存在、metrics 与 graph 一致",
+      "value": "runId true；5 级投影 true；metrics 一致 true",
+      "threshold": "三项结构契约均满足",
+      "pass": true,
+      "level": "L2"
+    }
+  ]
+}

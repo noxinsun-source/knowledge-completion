@@ -475,6 +475,16 @@ npx tsc --noEmit
 
 CI 位于 `.github/workflows/ci.yml`。数据库结构变化还应运行 `npm run db:generate` 并审查 SQL 与 snapshot。
 
+### 12.1 评测体系
+
+仓库内置一套**可运行评测框架**（独立存放在 [`evaluation/`](evaluation/) 目录）：把「核心思想 → Agent 策略 → 可量化指标 → 成熟度阈值」逐层拆解，并用 [`evaluation/benchmark.mjs`](evaluation/benchmark.mjs) 直接导入 `packages/` 真实实现逐项测量（知识扩散用确定性 mock provider 验证，离线可复现）。
+
+```bash
+node --experimental-strip-types evaluation/benchmark.mjs
+```
+
+实测结果 **9/9 指标通过，成熟度 L3（成熟）**；完整原理说明见 [`evaluation/README.md`](evaluation/README.md)，可视化汇报见 [`evaluation/report.html`](evaluation/report.html)（浏览器直接打开）。
+
 ## 13. 安全与部署
 
 ### 13.1 部署到 Cloudflare Workers + D1（已实测构建通过）

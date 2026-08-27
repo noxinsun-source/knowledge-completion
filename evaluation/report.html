@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>知识补全（知识扩散） · 评测汇报</title>
+<style>
+  :root { --ink:#1c2333; --sub:#5b6478; --line:#e6e8ef; --violet:#6d5ef2; --mint:#17b890; --amber:#f5a623; --red:#e5484d; --bg:#f7f8fb; --card:#fff; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif; color:var(--ink); background:var(--bg); line-height:1.7; }
+  header { background:linear-gradient(135deg,#6d5ef2,#17b890); color:#fff; padding:44px 32px; }
+  header h1 { margin:0 0 8px; font-size:28px; letter-spacing:.5px; }
+  header p { margin:0; opacity:.92; max-width:860px; }
+  main { max-width:1080px; margin:0 auto; padding:28px 20px 60px; }
+  .feature { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:28px; margin-bottom:28px; box-shadow:0 2px 14px rgba(28,35,51,.05); }
+  .feat-head { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; border-bottom:1px solid var(--line); padding-bottom:16px; margin-bottom:18px; }
+  .feat-head h2 { margin:0; font-size:22px; }
+  .gauge { display:flex; align-items:center; gap:10px; }
+  .score { font-size:26px; font-weight:700; color:var(--violet); }
+  .maturity { font-size:13px; font-weight:600; padding:5px 12px; border-radius:999px; }
+  .maturity.l3 { background:#e4faf1; color:#0c8a63; }
+  .maturity.l2 { background:#eef0ff; color:#5b4fd6; }
+  .maturity.l1 { background:#fdf0ee; color:#c23a3f; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:20px; }
+  @media (max-width:760px){ .grid{grid-template-columns:1fr;} }
+  .card { background:var(--bg); border:1px solid var(--line); border-radius:12px; padding:18px; }
+  .card h3 { margin:0 0 10px; font-size:15px; color:var(--sub); text-transform:uppercase; letter-spacing:.5px; }
+  .card ol { margin:0; padding-left:20px; }
+  .card li { margin:6px 0; font-size:14px; }
+  h3 { font-size:15px; color:var(--sub); text-transform:uppercase; letter-spacing:.5px; margin:20px 0 10px; }
+  .tablewrap { overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; font-size:13.5px; }
+  th, td { text-align:left; padding:10px 10px; border-bottom:1px solid var(--line); vertical-align:top; }
+  thead th { background:var(--bg); color:var(--sub); font-weight:600; white-space:nowrap; }
+  tr.pass td.k { color:var(--mint); }
+  tr.fail td.k { color:var(--red); }
+  td.principle { color:var(--sub); }
+  td.threshold { color:var(--sub); white-space:nowrap; }
+  .badge { font-size:12px; font-weight:700; color:#fff; background:var(--violet); border-radius:6px; padding:2px 8px; white-space:nowrap; }
+  .note { color:var(--sub); font-size:12.5px; }
+  code { background:#eef0f6; padding:1px 6px; border-radius:5px; font-size:12.5px; }
+  footer { text-align:center; color:var(--sub); font-size:12.5px; padding:20px; }
+  .verdict { background:#fff8e8; border:1px solid #f3dfa8; border-radius:12px; padding:18px 22px; margin-bottom:28px; }
+  .verdict b { color:#a06b00; }
+</style>
+
+</head>
+<body>
+<header style="background:linear-gradient(135deg,#6d5ef2,#17b890);color:#fff;padding:44px 32px;">
+  <h1 style="margin:0 0 8px;font-size:26px;">知识补全（知识扩散） · 评测汇报</h1>
+  <p style="margin:0;opacity:.92;">核心思想、Agent 策略、可量化指标、成熟度阈值与实测结果。运行 <code>node --experimental-strip-types evaluation/benchmark.mjs</code> 离线复现。</p>
+</header>
+<main style="max-width:1080px;margin:0 auto;padding:28px 20px 60px;">
+  
+  <section class="feature">
+    <div class="feat-head">
+      <h2>知识补全（知识扩散）</h2>
+      <div class="gauge">
+        <span class="score">9/9</span>
+        <span class="maturity l3">L3（成熟）</span>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <h3>核心思想</h3>
+        <ol><li><b>地图没有唯一答案</b>：是在目标/受众/粒度/跳数/预算/阈值下的一次可审计建模。</li><li><b>证据必须可追溯</b>：excerpt 逐字存在，无证据相邻知识只作灰色边界。</li><li><b>扩散必须有界</b>：1–3 跳、节点预算、frontier 排序、novelty 阈值停止。</li><li><b>覆盖/深度/掌握分离</b>：亮点只表示「存在来源证据」，不等于收藏/理解/应用。</li></ol>
+      </div>
+      <div class="card">
+        <h3>Agent 策略与实现</h3>
+        <ol><li><code>validateMapSpec</code> 固定解释边界，越界值钳制。</li><li><code>provider.analyze</code> 提取笔记内可追溯概念（heuristic / 真实模型）。</li><li><code>normalizeConceptName</code> + <code>mergeAgentDrafts</code> 规范化去重合并。</li><li><code>compileAgentGraph</code> 证据校验、depth 计算、覆盖三态、boundary 识别。</li><li>有界扩散循环：<code>frontierForRound</code> 排序取前 8 → <code>expand</code> → novelty<0.1 或达预算停止。</li><li><code>projectAgentGraph</code> 五级确定性投影，切换粒度不重新调用模型。</li><li>持久化 runId + D1 + parentRunId，页面回读展示。</li></ol>
+      </div>
+    </div>
+    <h3>评测指标与实测结果</h3>
+    <div class="tablewrap"><table>
+      <thead><tr><th></th><th>指标</th><th>对应核心思想</th><th>实测值</th><th>成熟阈值</th><th>级别</th></tr></thead>
+      <tbody>
+    <tr class="pass">
+      <td class="k">✓</td>
+      <td>证据逐字命中率</td>
+      <td class="principle">证据可追溯：excerpt 必须逐字存在于笔记</td>
+      <td>证据节点 25/25；逐字命中 true</td>
+      <td class="threshold">带证据的 excerpt 100% 逐字命中</td>
+      <td class="badge">L2</td>
+    </tr>
+    <tr class="pass">
+      <td class="k">✓</td>
+      <td>伪造证据降级</td>
+      <td class="principle">证据可追溯 + 无来源概念保持边界</td>
+      <td>伪造证据 sourceType=model；概念 coverage=missing</td>
+      <td class="threshold">伪造 excerpt 不产生 note 级证据</td>
+      <td class="badge">L2</td>
+    </tr>
+    <tr class="pass">
+      <td class="k">✓</td>
+      <td>知识扩散有界性</td>
+      <td class="principle">有界扩散：maxNodes 预算 + 1–3 跳 + 停止原因</td>
+      <td>节点 12/12；最大深度 1/4；停止原因 [max-nodes-reached]</td>
+      <td class="threshold">节点 ≤ 预算 且 深度 ≤ radius+1 且 有 trace</td>
+      <td class="badge">L2</td>
+    </tr>
+    <tr class="pass">
+      <td class="k">✓</td>
+      <td>边界节点识别</td>
+      <td class="principle">缺口识别：无笔记证据的相邻知识保持灰色边界</td>
+      <td>seed 1（均有证据 true）；boundary 1（均无证据 true）</td>
+      <td class="threshold">seed&gt;0 且 boundary&gt;0 且证据对应关系正确</td>
+      <td class="badge">L3</td>
+    </tr>
+    <tr class="pass">
+      <td class="k">✓</td>
+      <td>五级投影确定性与单调性</td>
+      <td class="principle">五级投影：粒度切换不重新调用模型，确定性折叠/展开</td>
+      <td>节点数 [1, 4, 18, 23, 25]；确定性 true；单调 true；覆盖 [0.7, 0.614, 0.778, 0.717, 0.7]</td>
+      <td class="threshold">确定性 + 单调性 均为 true</td>
+      <td class="badge">L2</td>
+    </tr>
+    <tr class="pass">
+      <td class="k">✓</td>
+      <td>概念规范化去重</td>
+      <td class="principle">概念规范化：别名解析为同一 canonical concept</td>
+      <td>中文变体合并 true；英文变体合并 true；跨语言区分 true</td>
+      <td class="threshold">同语言变体合并</td>
+      <td class="badge">L2</td>
+    </tr>
+    <tr class="pass">
+      <td class="k">✓</td>
+      <td>MapSpec 越界钳制</td>
+      <td class="principle">MapSpec 固定解释边界</td>
+      <td>granularity 5/5；radius 3/3；maxNodes 60/60；阈值 0.95/0.95</td>
+      <td class="threshold">越界值被钳制到边界</td>
+      <td class="badge">L2</td>
+    </tr>
+    <tr class="pass">
+      <td class="k">✓</td>
+      <td>覆盖三态区分</td>
+      <td class="principle">覆盖/深度/掌握分离：图上亮点只表示「存在来源证据」</td>
+      <td>covered=covered；partial=partial；missing=missing</td>
+      <td class="threshold">三态与证据数量一致</td>
+      <td class="badge">L3</td>
+    </tr>
+    <tr class="pass">
+      <td class="k">✓</td>
+      <td>Run 契约结构</td>
+      <td class="principle">每次调用唯一 runId + 持久化图谱 + 五级投影</td>
+      <td>runId true；5 级投影 true；metrics 一致 true</td>
+      <td class="threshold">三项结构契约均满足</td>
+      <td class="badge">L2</td>
+    </tr></tbody>
+    </table></div>
+    <p class="note">生成时间：2026-08-27T03:20:19.496Z · 运行 <code>node --experimental-strip-types evaluation/benchmark.mjs</code> 可离线复现。</p>
+  </section>
+</main>
+<footer style="text-align:center;color:#5b6478;font-size:12.5px;padding:20px;">由 evaluation/benchmark.mjs 实测生成 · 2026-08-27T06:03:34.511Z</footer>
+</body>
+</html>
