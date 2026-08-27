@@ -9,7 +9,7 @@
   <img alt="License" src="https://img.shields.io/badge/License-MIT-59636E">
 </p>
 
-> 准备提交、答辩或现场演示？请先阅读 **[评委评审与本地运行指南](START-HERE-评审指南.md)**，其中包含源码包下载、8 分钟跑通、密集图谱复现和验收清单。
+> 想快速上手？请先阅读 **[快速上手与本地运行指南](QUICKSTART.md)**，其中包含源码获取、8 分钟跑通、密集图谱复现与验证清单。
 
 ![知识补全真实三跳 Agent Run 页面：30 个节点与 65 条关系](public/readme-agent-run-dense.jpg)
 

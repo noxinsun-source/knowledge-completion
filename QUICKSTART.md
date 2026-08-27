@@ -1,6 +1,6 @@
-# 知识补全项目：评委评审与本地运行指南
+# 知识补全项目 · 快速上手
 
-> 本文是提交、答辩和现场演示的第一入口。评委不需要安装 Codex 或 Claude Code，也可以独立运行完整产品；安装 AI Plugin / Skill 是可选的第二种使用方式。
+> 本文是快速上手指南。你不需要安装 Codex 或 Claude Code，也能独立运行完整产品；安装 AI Plugin / Skill 是可选的第二种使用方式。
 
 ## 1. 一句话定义
 
@@ -17,37 +17,37 @@
 - 无模型密钥也能执行的离线模式；
 - 单元测试、接口测试、UI 契约测试与构建验证。
 
-## 2. 交付包是什么
+## 2. 源码包是什么
 
-评审 ZIP 是从 Git 已提交版本直接生成的**干净源码快照**，不是从工作目录随意压缩。因此它会包含真正需要交付的源文件，同时排除：
+源码 ZIP 是从 Git 已提交版本直接生成的**干净源码快照**，不是从工作目录随意压缩。因此它会包含真正需要随包发布的源文件，同时排除：
 
 - `node_modules/`：约数百 MB，且与操作系统和 Node 版本相关，应由 `npm ci` 从锁文件重建；
 - `.git/`：提交历史不影响运行，GitHub 仓库保留完整历史；
 - `dist/`、`.next/`、`.vinext/`：可重复生成的构建缓存；
-- `.wrangler/` 和本机 D1 数据：可能含评审者不需要的本地运行状态；
+- `.wrangler/` 和本机 D1 数据：可能含与本机相关的本地运行状态；
 - `.env*`、密钥和本机凭证；
 - 临时输出、运行日志和未提交实验文件。
 
-交付包会保留 `package-lock.json`，因此 `npm ci` 能安装与本项目验证时一致的依赖版本。
+源码包会保留 `package-lock.json`，因此 `npm ci` 能安装与本项目验证时一致的依赖版本。
 
 ## 3. 三种获取方式
 
-### 方式 A：使用随评审材料提供的 ZIP
+### 方式 A：使用源码 ZIP
 
-解压 `knowledge-completion-review-<commit>.zip`，进入其中的 `knowledge-completion/` 目录，然后执行第 4 节命令。
+解压 `knowledge-completion-<commit>.zip`，进入其中的 `knowledge-completion/` 目录，然后执行第 4 节命令。
 
 ZIP 同目录提供 `SHA256SUMS.txt`。可用以下方式确认文件没有在传输中损坏：
 
 macOS / Linux：
 
 ```bash
-shasum -a 256 knowledge-completion-review-<commit>.zip
+shasum -a 256 knowledge-completion-<commit>.zip
 ```
 
 Windows PowerShell：
 
 ```powershell
-Get-FileHash .\knowledge-completion-review-<commit>.zip -Algorithm SHA256
+Get-FileHash .\knowledge-completion-<commit>.zip -Algorithm SHA256
 ```
 
 ### 方式 B：从 GitHub 克隆
@@ -91,7 +91,7 @@ npm --version
 npm ci
 ```
 
-如果评审环境修改过 `package-lock.json`，才使用 `npm install`；对于未修改的交付包，推荐使用确定性更强的 `npm ci`。
+如果你修改过 `package-lock.json`，才使用 `npm install`；对于未修改的源码包，推荐使用确定性更强的 `npm ci`。
 
 ### 4.3 启动前后端一体化产品
 
@@ -170,7 +170,7 @@ node plugins/knowledge-completion/skills/knowledge-completion/scripts/submit-run
 --no-open
 ```
 
-## 6. 评委建议验收路径
+## 6. 推荐体验与验证路径
 
 ### 6.1 验证“不是静态 Demo”
 
@@ -283,7 +283,7 @@ knowledge-completion/
 
 ## 11. 当前产品边界
 
-当前版本适合本地单用户评审、产品验证和二次开发。它还不是公开 SaaS：
+当前版本适合本地单用户使用、产品验证和二次开发。它还不是公开 SaaS：
 
 - 没有用户登录；
 - 没有多租户隔离；
@@ -291,7 +291,7 @@ knowledge-completion/
 - Run API 会保存完整笔记正文；
 - 远程部署前必须补充认证、授权、租户、配额和隐私策略。
 
-因此评审时建议使用本地 `localhost:4318`。不要把未经安全加固的服务直接暴露到公网。
+因此建议使用本地 `localhost:4318`。不要把未经安全加固的服务直接暴露到公网。
 
 ## 12. 常见问题
 
@@ -313,11 +313,11 @@ knowledge-completion/
 
 ### GitHub 上有没有已经部署的公共网站
 
-当前仓库提供可运行、可部署的完整代码，但没有承诺公共 SaaS 地址。评审请按本文本地启动，以避免把完整笔记发送给未知服务。
+当前仓库提供可运行、可部署的完整代码，但没有承诺公共 SaaS 地址。请按本文本地启动，以避免把完整笔记发送给未知服务。
 
-## 13. 提交前最终清单
+## 13. 发布前检查清单
 
-- [ ] ZIP 文件名包含提交 commit 短哈希；
+- [ ] ZIP 文件名包含对应 commit 短哈希；
 - [ ] `SHA256SUMS.txt` 与 ZIP 校验一致；
 - [ ] ZIP 内第一层目录为 `knowledge-completion/`；
 - [ ] 根目录包含本指南、README、LICENSE、package.json 和 package-lock.json；
@@ -326,4 +326,4 @@ knowledge-completion/
 - [ ] GitHub `main` 与 ZIP 来源 commit 一致；
 - [ ] 对应 GitHub Actions CI 为绿色。
 
-如评审时间有限，建议依次检查：**第 4 节启动 → 第 5 节生成 Run → 第 6 节验证真实链路**。
+如时间有限，建议依次检查：**第 4 节启动 → 第 5 节生成 Run → 第 6 节验证真实链路**。
