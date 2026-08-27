@@ -3,6 +3,7 @@ import {
   createKnowledgeAgentRun,
   listKnowledgeAgentRuns,
   parseKnowledgeAgentRunStatus,
+  providerFromBindings,
 } from "@/apps/api/src/agent-run-service";
 
 function json(body: unknown, status = 200, headers?: HeadersInit) {
@@ -10,6 +11,18 @@ function json(body: unknown, status = 200, headers?: HeadersInit) {
     status,
     headers: { "cache-control": "no-store", ...headers },
   });
+}
+
+/** 合并 Worker bindings 与 Node 环境变量，作为模型 provider 配置来源。 */
+function runProviderBindings() {
+  const runtimeEnv: Record<string, string | undefined> =
+    typeof process !== "undefined" && process.env ? process.env : {};
+  const bindings: Record<string, unknown> = { ...env };
+  const flat: Record<string, string | undefined> = {};
+  for (const [key, value] of Object.entries(bindings)) {
+    if (typeof value === "string") flat[key] = value;
+  }
+  return { ...runtimeEnv, ...flat };
 }
 
 function runUrls(request: Request, runId: string) {
@@ -42,7 +55,9 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const input = await request.json();
-    const run = await createKnowledgeAgentRun(env.DB, input);
+    const run = await createKnowledgeAgentRun(env.DB, input, {
+      provider: providerFromBindings(runProviderBindings()),
+    });
     const urls = runUrls(request, run.runId);
     if (run.status === "failed") {
       return json({ run, error: run.error, ...urls }, 422, { location: urls.dashboardUrl });

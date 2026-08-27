@@ -1,0 +1,21 @@
+{
+  // Copy this file to wrangler.jsonc and fill the placeholders before running
+  // `npx @vinext/cloudflare deploy`.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "knowledge-completion",
+  "account_id": "<your-cloudflare-account-id>",
+  "compatibility_date": "2026-02-12",
+  "compatibility_flags": ["nodejs_compat"],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "knowledge-completion",
+      "database_id": "<your-d1-database-id>"
+    }
+  ],
+  // Optional model provider. Prefer `npx wrangler secret put` for the API key.
+  "vars": {
+    "KNOWLEDGE_AGENT_BASE_URL": "https://api.deepseek.com",
+    "KNOWLEDGE_AGENT_MODEL": "deepseek-chat"
+  }
+}

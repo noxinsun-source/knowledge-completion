@@ -15,6 +15,10 @@
 
 <p align="center"><sub>真实持久化三跳 Run：Plugin / Skill 提交笔记与宿主 AI 草稿后生成唯一 runId，页面从 D1 回读 30 个节点、65 条关系和五级投影；亮点表示逐字可核验的笔记证据，灰点表示尚未覆盖的相邻知识。</sub></p>
 
+![功能演示动图：点击证据节点查看详情 → 联网搜索相邻知识 → 1–5 级粒度即时切换](public/demo.gif)
+
+<p align="center"><sub>真实录屏：这段动图对应一次由 DeepSeek `deepseek-chat` 真实生成的持久化 Run（`provider: openai-compatible:deepseek-chat`）。点击亮色节点查看逐字证据，右侧联网搜索拉取跨来源相邻知识，再切换 1–5 级粒度——粒度切换不重新调用模型，只做确定性投影折叠/展开。</sub></p>
+
 知识补全不是一张预先写死的“标准答案知识树”。它把地图定义成：**在某个用户目标、受众、粒度、扩展跳数、节点预算和证据阈值下，对当前输入笔记所做的一次可审计建模**。
 
 本仓库同时提供：
@@ -51,6 +55,19 @@ npm run dev
 产品地址：<http://localhost:4318>
 
 不要直接双击 HTML 文件。产品包含 API、D1 持久化和动态路由，必须由 `npm run dev` 或正式部署运行。
+
+### 1.2.1 让 Run API 调用真实模型（可选，已实测）
+
+默认不配置密钥时，`POST /api/runs` 使用 `heuristic-offline-v1` 离线提取（只承认笔记内证据，绝不伪装知道笔记外知识）。要让 Run API 本身调用真实 OpenAI-compatible 模型做有界语义扩展，只需在启动前导出三个环境变量：
+
+```bash
+export KNOWLEDGE_AGENT_BASE_URL=https://api.deepseek.com   # 或 https://api.openai.com/v1、硅基流动等
+export KNOWLEDGE_AGENT_MODEL=deepseek-chat                  # 或 gpt-4.1、Qwen/Qwen3-8B 等
+export KNOWLEDGE_AGENT_API_KEY=sk-你的密钥
+npm run dev
+```
+
+之后用浏览器或 helper 创建 Run 时，响应里的 `provider` 会变成 `openai-compatible:<model>`，图谱会包含真实模型提出的相邻知识（无笔记证据的节点自动保持灰色边界）。这三个变量同样驱动 `npm run agent` 的 CLI 模型模式，与 Run API 共享同一套 provider 实现。
 
 ### 1.3 从一篇笔记创建真实 Run
 
@@ -460,7 +477,32 @@ CI 位于 `.github/workflows/ci.yml`。数据库结构变化还应运行 `npm ru
 
 ## 13. 安全与部署
 
-本地默认数据包括完整笔记正文、图谱、证据和运行指标。部署前至少补齐：
+### 13.1 部署到 Cloudflare Workers + D1（已实测构建通过）
+
+本产品基于 [vinext](https://github.com/cloudflare/vinext)，生产环境以 Cloudflare Workers 为原生运行时，D1 持久化 Run。步骤：
+
+```bash
+# 1) 登录并创建 D1 数据库
+npx wrangler login
+npx wrangler d1 create knowledge-completion   # 记下返回的 database_id
+
+# 2) 把 database_id 填入仓库根目录 wrangler.jsonc 的 d1_databases[0].database_id
+#    （模板见 wrangler.jsonc.example；account_id 可在 dash.cloudflare.com/<account-id> 或 wrangler whoami 找到）
+
+# 3) 设置真实模型（可选，未配置则保持离线 heuristic）
+npx wrangler secret put KNOWLEDGE_AGENT_API_KEY    # 粘贴 sk-...（可选）
+npx wrangler secret put KNOWLEDGE_AGENT_BASE_URL   # 或写入 Worker 变量
+npx wrangler secret put KNOWLEDGE_AGENT_MODEL
+
+# 4) 一键构建并部署
+npx @vinext/cloudflare deploy
+```
+
+D1 表结构会在首次 `POST /api/runs` 时通过 `CREATE TABLE IF NOT EXISTS` 自动初始化（另有 `drizzle/` 迁移快照供审计，`npm run db:generate` 可重新生成）。部署后访问 Worker 域名即可；本地开发仍用 `npm run dev`（miniflare 提供本地 D1）。
+
+### 13.2 部署前安全加固清单
+
+本地默认数据包括完整笔记正文、图谱、证据和运行指标。部署到公网前至少补齐：
 
 - 身份认证与授权；
 - 多租户隔离；

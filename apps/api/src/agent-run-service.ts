@@ -12,6 +12,9 @@ import {
   normalizeConceptName,
   runKnowledgeAgent,
 } from "../../../packages/knowledge-agent/src/index.ts";
+import {
+  createOpenAICompatibleKnowledgeModel,
+} from "../../../packages/knowledge-agent/src/index.ts";
 import type {
   AgentGraphDraft,
   KnowledgeAgentModel,
@@ -453,10 +456,33 @@ export function buildKnowledgeAgentRunEvent(
   };
 }
 
-export async function createKnowledgeAgentRun(database: D1Database, input: unknown) {
+export async function createKnowledgeAgentRun(
+  database: D1Database,
+  input: unknown,
+  options: { provider?: KnowledgeAgentModel } = {},
+) {
   const repository = new D1KnowledgeAgentRunRepository(database);
   await repository.initialize();
-  return executeKnowledgeAgentRun(repository, input);
+  return executeKnowledgeAgentRun(repository, input, { provider: options.provider });
+}
+
+/**
+ * 从 Worker bindings / 环境变量构造真实模型 provider。
+ * 配置了 KNOWLEDGE_AGENT_BASE_URL 与 KNOWLEDGE_AGENT_MODEL 时，Run API 会调用
+ * 真实 OpenAI-compatible 服务（OpenAI、DeepSeek、硅基流动等）做有界语义扩展；
+ * 未配置时保持原离线 heuristic 行为，绝不伪装成功。
+ */
+export function providerFromBindings(
+  bindings: Record<string, string | undefined>,
+): KnowledgeAgentModel | undefined {
+  const baseUrl = bindings.KNOWLEDGE_AGENT_BASE_URL?.trim();
+  const model = bindings.KNOWLEDGE_AGENT_MODEL?.trim();
+  if (!baseUrl || !model) return undefined;
+  return createOpenAICompatibleKnowledgeModel({
+    baseUrl,
+    model,
+    apiKey: bindings.KNOWLEDGE_AGENT_API_KEY?.trim() || undefined,
+  });
 }
 
 export async function getKnowledgeAgentRun(database: D1Database, runId: string) {
@@ -482,10 +508,13 @@ export async function recomputeKnowledgeAgentRun(
   database: D1Database,
   runId: string,
   overrides: unknown,
+  options: { provider?: KnowledgeAgentModel } = {},
 ) {
   const repository = new D1KnowledgeAgentRunRepository(database);
   await repository.initialize();
-  return recomputeKnowledgeAgentRunWithStore(repository, runId, overrides);
+  return recomputeKnowledgeAgentRunWithStore(repository, runId, overrides, {
+    provider: options.provider,
+  });
 }
 
 export async function recomputeKnowledgeAgentRunWithStore(
