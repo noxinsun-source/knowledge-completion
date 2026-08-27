@@ -15,9 +15,20 @@
 
 <p align="center"><sub>真实持久化三跳 Run：Plugin / Skill 提交笔记与宿主 AI 草稿后生成唯一 runId，页面从 D1 回读 30 个节点、65 条关系和五级投影；亮点表示逐字可核验的笔记证据，灰点表示尚未覆盖的相邻知识。</sub></p>
 
-![功能演示动图：首页输入笔记与颗粒度/跳数 → 真实模型生成知识网络 → 1–5 级粒度切换 → 节点联网搜索真实结果](public/demo.gif)
+<p align="center"><b>四段真实录屏（点击任意一张可放大）：</b></p>
 
-<p align="center"><sub>真实录屏：在首页表单输入任意笔记、选择「知识颗粒度」与「扩散跳数」，提交后由 DeepSeek `deepseek-chat` 真实生成多跳知识扩散与五级层级（`provider: openai-compatible:deepseek-chat`）。随后切换 1–5 级粒度（确定性投影折叠/展开，不重新调用模型），点击节点打开详情并联网搜索，右侧返回跨来源真实搜索结果（Crossref / Europe PMC / arXiv / Wikipedia，配置 `BING_WEB_SEARCH_API_KEY` 后追加 Bing 网页搜索）。</sub></p>
+<table>
+  <tr>
+    <td align="center" width="50%"><a href="public/demo/input.gif"><img src="public/demo/input.gif" width="100%" alt="① 输入笔记与颗粒度/跳数"></a><br><sub>① 首页输入任意笔记 + 选颗粒度/跳数，实时显示「真实模型已接入」</sub></td>
+    <td align="center" width="50%"><a href="public/demo/hierarchy.gif"><img src="public/demo/hierarchy.gif" width="100%" alt="② 五级知识粒度"></a><br><sub>② 五级知识粒度切换：1 领域 → 3 概念 → 5 公式实现，层级即时折叠/展开</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%"><a href="public/demo/evidence.gif"><img src="public/demo/evidence.gif" width="100%" alt="③ 节点逐字证据"></a><br><sub>③ 点击节点查看逐字可核验的笔记证据</sub></td>
+    <td align="center" width="50%"><a href="public/demo/search.gif"><img src="public/demo/search.gif" width="100%" alt="④ 联网搜索真实结果"></a><br><sub>④ 节点联网搜索 → 右侧返回 Crossref / Europe PMC / arXiv / Wikipedia 真实结果</sub></td>
+  </tr>
+</table>
+
+<p align="center"><sub>以上四段均为真实录屏，由 DeepSeek `deepseek-chat`（`provider: openai-compatible:deepseek-chat`）真实生成知识网络。完整串联流程见 <a href="public/demo.gif">完整演示动图</a>。</sub></p>
 
 知识补全不是一张预先写死的“标准答案知识树”。它把地图定义成：**在某个用户目标、受众、粒度、扩展跳数、节点预算和证据阈值下，对当前输入笔记所做的一次可审计建模**。
 
