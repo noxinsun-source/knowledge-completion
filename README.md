@@ -82,6 +82,18 @@ npm run dev
 
 之后用浏览器或 helper 创建 Run 时，响应里的 `provider` 会变成 `openai-compatible:<model>`，图谱会包含真实模型提出的相邻知识（无笔记证据的节点自动保持灰色边界）。这三个变量同样驱动 `npm run agent` 的 CLI 模型模式，与 Run API 共享同一套 provider 实现。
 
+`KNOWLEDGE_AGENT_BASE_URL` 接受任意 OpenAI-compatible 端点，覆盖以下常见适配场景（模型名按各自服务填写）：
+
+| 场景 | `KNOWLEDGE_AGENT_BASE_URL` | 模型示例 | 说明 |
+|---|---|---|---|
+| 本机 Ollama | `http://127.0.0.1:11434/v1` | `qwen3.5:9b` | 走 Ollama 的 OpenAI 兼容端点，免 key |
+| 远程服务器（SSH 隧道） | `http://127.0.0.1:<转发端口>/v1` | 服务器已拉取模型 | 先 `ssh -N -L 8000:localhost:8000 user@server` |
+| OpenAI | `https://api.openai.com/v1` | `gpt-4.1` | |
+| DeepSeek | `https://api.deepseek.com` | `deepseek-chat` | 已实测 |
+| 硅基流动 SiliconFlow | `https://api.siliconflow.cn/v1` | `Qwen/Qwen3-8B` | |
+| OpenRouter | `https://openrouter.ai/api/v1` | `openai/gpt-4o-mini` | 多模型聚合 |
+| 自定义 / vLLM / LiteLLM | 自填 | 自填 | 任何 `/chat/completions` 网关 |
+
 ### 1.3 从一篇笔记创建真实 Run
 
 另开一个终端：
