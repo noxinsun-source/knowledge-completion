@@ -557,6 +557,7 @@ const PROVIDER_LABELS: Record<ExternalKnowledgeSource["provider"], string> = {
   arxiv: "arXiv",
   openalex: "OpenAlex",
   wikipedia: "Wikipedia",
+  bing: "Bing 搜索",
 };
 
 function sourceHostname(source: ExternalKnowledgeSource) {

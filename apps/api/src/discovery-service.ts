@@ -62,7 +62,7 @@ function relevanceScore(query: string, source: ExternalKnowledgeSource) {
 }
 
 function trust(provider: Provider, options: { doi?: string; citations?: number; year?: number; crossListed?: number }) {
-  const base = { crossref: 0.72, "europe-pmc": 0.78, arxiv: 0.63, openalex: 0.74, wikipedia: 0.68 }[provider];
+  const base = { crossref: 0.72, "europe-pmc": 0.78, arxiv: 0.63, openalex: 0.74, wikipedia: 0.68, bing: 0.7 }[provider];
   const signals = [`${provider} 结构化元数据`];
   let score = base;
   if (options.doi) { score += 0.08; signals.push("具有 DOI"); }
@@ -77,7 +77,7 @@ function trust(provider: Provider, options: { doi?: string; citations?: number; 
 
 async function fetchJson(url: string) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 8_000);
+  const timeout = setTimeout(() => controller.abort(), 15_000);
   try {
     const response = await fetch(url, { headers: { "user-agent": USER_AGENT, accept: "application/json" }, signal: controller.signal });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -158,7 +158,7 @@ async function arxiv(query: string, limit: number): Promise<ExternalKnowledgeSou
   url.searchParams.set("max_results", String(limit));
   url.searchParams.set("sortBy", "relevance");
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 8_000);
+  const timeout = setTimeout(() => controller.abort(), 15_000);
   let text: string;
   try {
     const response = await fetch(url, { headers: { "user-agent": USER_AGENT }, signal: controller.signal });
@@ -221,6 +221,48 @@ async function runProvider(provider: Provider, operation: () => Promise<External
   const started = Date.now();
   try { return { provider, sources: await operation(), latencyMs: Date.now() - started }; }
   catch (error) { return { provider, sources: [], latencyMs: Date.now() - started, error: error instanceof Error ? error.message : "Unknown provider error" }; }
+}
+
+/** Bing Web Search API：真实网页搜索。需要 BING_WEB_SEARCH_API_KEY（Azure Bing Search v7）。 */
+async function bing(query: string, limit: number, apiKey: string): Promise<ExternalKnowledgeSource[]> {
+  const url = new URL("https://api.bing.microsoft.com/v7.0/search");
+  url.searchParams.set("q", query);
+  url.searchParams.set("count", String(limit));
+  url.searchParams.set("mkt", /[\u3400-\u9fff]/u.test(query) ? "zh-CN" : "en-US");
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 20_000);
+  let payload: Record<string, unknown>;
+  try {
+    const response = await fetch(url.toString(), {
+      headers: { "user-agent": USER_AGENT, "Ocp-Apim-Subscription-Key": apiKey, accept: "application/json" },
+      signal: controller.signal,
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    payload = await response.json() as Record<string, unknown>;
+  } finally { clearTimeout(timeout); }
+  const webPages = payload.webPages as { value?: Array<Record<string, unknown>> } | undefined;
+  return (webPages?.value ?? []).flatMap((item) => {
+    const title = cleanMarkup(typeof item.name === "string" ? item.name : undefined) ?? "";
+    const canonicalUrl = typeof item.url === "string" ? item.url : "";
+    if (!title || !canonicalUrl) return [];
+    const abstract = cleanMarkup(typeof item.snippet === "string" ? item.snippet : undefined);
+    const displayUrl = typeof item.displayUrl === "string" ? item.displayUrl : undefined;
+    const rating = trust("bing", {});
+    return [{
+      id: `source_bing_${stableId(canonicalUrl)}`,
+      provider: "bing" as const,
+      title,
+      url: canonicalUrl,
+      canonicalUrl,
+      abstract,
+      authors: displayUrl ? [displayUrl] : [],
+      sourceType: "other" as const,
+      trustScore: rating.score,
+      trustSignals: [...rating.signals, "Bing 网页搜索"],
+      matchedConceptIds: matchedConceptIds(title, abstract),
+      duplicateProviders: [],
+    }];
+  });
 }
 
 export function deduplicateSources(sources: ExternalKnowledgeSource[]) {
@@ -299,7 +341,7 @@ async function cacheKey(query: string, limit: number, crawlTop: number) {
   return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
-export async function discoverSources(database: D1Database, queryInput: string, options?: { limitPerProvider?: number; crawlTop?: number }) {
+export async function discoverSources(database: D1Database, queryInput: string, options?: { limitPerProvider?: number; crawlTop?: number; bingApiKey?: string }) {
   const query = queryInput.trim().slice(0, 300);
   if (!query) throw new TypeError("query must be a non-empty string.");
   const limit = Math.min(10, Math.max(1, Math.round(options?.limitPerProvider ?? 5)));
@@ -310,12 +352,18 @@ export async function discoverSources(database: D1Database, queryInput: string, 
   const cached = await repository.getDiscoveryCache(key);
   if (cached) return { ...cached, cache: "hit" as const };
   const externalQuery = providerQuery(query);
-  const results = await Promise.all([
+  const providers: Array<Promise<ProviderResult>> = [
     runProvider("crossref", () => crossref(externalQuery, limit)),
     runProvider("europe-pmc", () => europePmc(externalQuery, limit)),
     runProvider("arxiv", () => arxiv(externalQuery, limit)),
     runProvider("wikipedia", () => wikipedia(query, limit)),
-  ]);
+  ];
+  // 真实网页搜索：配置 BING_WEB_SEARCH_API_KEY 时启用 Bing Web Search；未配置则跳过，不影响其它来源。
+  const bingApiKey = options?.bingApiKey?.trim();
+  if (bingApiKey) {
+    providers.push(runProvider("bing", () => bing(query, limit, bingApiKey)));
+  }
+  const results = await Promise.all(providers);
   const raw = results.flatMap((result) => result.sources);
   let sources = deduplicateSources(raw).sort((a, b) => relevanceScore(query, b) - relevanceScore(query, a));
   if (crawlTop) {

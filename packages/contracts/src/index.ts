@@ -130,7 +130,7 @@ export interface MapSpecSuggestion {
 
 export interface ExternalKnowledgeSource {
   id: string;
-  provider: "crossref" | "europe-pmc" | "arxiv" | "openalex" | "wikipedia";
+  provider: "crossref" | "europe-pmc" | "arxiv" | "openalex" | "wikipedia" | "bing";
   title: string;
   url: string;
   canonicalUrl: string;

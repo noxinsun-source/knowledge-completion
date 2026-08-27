@@ -69,3 +69,54 @@ textarea:focus-visible {
   outline: 2px solid color-mix(in srgb, var(--mwb-rose-deep) 62%, transparent);
   outline-offset: 2px;
 }
+
+/* 输入笔记 → 创建 Run 的表单 */
+.run-creator {
+  max-width: 1000px;
+  margin: 28px auto 0;
+  padding: 22px 24px 20px;
+  background: var(--mwb-card);
+  border: 1px solid var(--mwb-line);
+  border-radius: 18px;
+  box-shadow: var(--mwb-shadow-md);
+}
+.run-creator-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.run-creator-head h2 { margin: 0; font-size: 19px; letter-spacing: .3px; }
+.model-pill { font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 999px; }
+.model-pill.is-live { background: #e3f3ec; color: var(--mwb-green); }
+.model-pill.is-offline { background: var(--mwb-warning-bg); color: var(--mwb-warning); }
+.model-pill.is-checking { background: #ece7df; color: var(--mwb-muted); }
+.run-creator-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.run-creator-grid .wide { grid-column: 1 / -1; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field > span { font-size: 13px; color: var(--mwb-muted); font-weight: 600; }
+.field input, .field select, .field textarea {
+  font-family: var(--mt-sans);
+  font-size: 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--mwb-line);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--mwb-ink);
+  resize: vertical;
+}
+.field textarea { line-height: 1.6; }
+.run-creator-error { color: var(--mwb-danger); font-size: 13px; margin: 12px 0 0; }
+.run-creator-actions { display: flex; align-items: center; gap: 16px; margin-top: 16px; flex-wrap: wrap; }
+.run-creator-actions button {
+  font-size: 15px; font-weight: 600;
+  padding: 12px 22px;
+  border: none; border-radius: 12px;
+  background: var(--mwb-green); color: #fff;
+  cursor: pointer;
+}
+.run-creator-actions button:disabled { opacity: .65; cursor: progress; }
+.run-creator-actions .hint { font-size: 12px; color: var(--mwb-muted); max-width: 460px; margin: 0; }
+.run-creator-actions code { background: #efe9e0; padding: 1px 5px; border-radius: 5px; }
+
+.demo-section { position: relative; }
+.demo-section-label {
+  max-width: 1000px; margin: 26px auto 10px; padding: 0 24px;
+  font-size: 12px; color: var(--mwb-muted); letter-spacing: .3px;
+}
+@media (max-width: 720px) { .run-creator-grid { grid-template-columns: 1fr; } }

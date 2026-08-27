@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { KnowledgeNetworkApp } from "@/apps/web/src/components/KnowledgeNetworkApp";
+import { RunCreatorForm } from "@/apps/web/src/components/RunCreatorForm";
 import { DEMO_NOTES } from "@/fixtures/demo/transformer-notes";
 import { analyzeKnowledgeNetwork } from "@/packages/knowledge-engine/src";
 
@@ -38,8 +39,14 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default function Home() {
   return (
-    <KnowledgeNetworkApp
-      initialAnalysis={analyzeKnowledgeNetwork(DEMO_NOTES)}
-    />
+    <>
+      <RunCreatorForm />
+      <section className="demo-section" aria-label="内置离线样例演示">
+        <div className="demo-section-label">内置离线样例 · 不调用模型 · 仅演示 360° 有机布局</div>
+        <KnowledgeNetworkApp
+          initialAnalysis={analyzeKnowledgeNetwork(DEMO_NOTES)}
+        />
+      </section>
+    </>
   );
 }

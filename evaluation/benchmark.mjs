@@ -92,8 +92,7 @@ const notes = [
       }));
       return { scope: spec.goal, scopeDescription: "mock", concepts, relations: [] };
     },
-    async expand({ graph, round, spec }) {
-      const base = graph.concepts.length;
+    async expand({ graph, round }) {
       const concepts = Array.from({ length: 12 }, (_, i) => ({
         name: `相邻概念-r${round}-${i}`, semanticType: "concept", granularity: 4, description: "adjacent", confidence: 0.6, expandable: true,
         evidence: [],
@@ -107,8 +106,6 @@ const notes = [
   const withinBudget = run.graph.concepts.length <= 12;
   const maxDepth = Math.max(...run.graph.concepts.map((c) => c.depth));
   const depthBounded = maxDepth <= 3 + 1;
-  const boundaryCount = run.graph.concepts.filter((c) => c.discoveryState === "boundary").length;
-  const seedCount = run.graph.concepts.filter((c) => c.discoveryState === "seed").length;
   const stopReasons = run.trace.map((t) => t.stopReason).filter(Boolean);
   record({
     id: "bounded-expansion",

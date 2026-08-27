@@ -15,9 +15,9 @@
 
 <p align="center"><sub>真实持久化三跳 Run：Plugin / Skill 提交笔记与宿主 AI 草稿后生成唯一 runId，页面从 D1 回读 30 个节点、65 条关系和五级投影；亮点表示逐字可核验的笔记证据，灰点表示尚未覆盖的相邻知识。</sub></p>
 
-![功能演示动图：点击证据节点查看详情 → 联网搜索相邻知识 → 1–5 级粒度即时切换](public/demo.gif)
+![功能演示动图：首页输入笔记与颗粒度/跳数 → 真实模型生成知识网络 → 1–5 级粒度切换 → 节点联网搜索真实结果](public/demo.gif)
 
-<p align="center"><sub>真实录屏：这段动图对应一次由 DeepSeek `deepseek-chat` 真实生成的持久化 Run（`provider: openai-compatible:deepseek-chat`）。点击亮色节点查看逐字证据，右侧联网搜索拉取跨来源相邻知识，再切换 1–5 级粒度——粒度切换不重新调用模型，只做确定性投影折叠/展开。</sub></p>
+<p align="center"><sub>真实录屏：在首页表单输入任意笔记、选择「知识颗粒度」与「扩散跳数」，提交后由 DeepSeek `deepseek-chat` 真实生成多跳知识扩散与五级层级（`provider: openai-compatible:deepseek-chat`）。随后切换 1–5 级粒度（确定性投影折叠/展开，不重新调用模型），点击节点打开详情并联网搜索，右侧返回跨来源真实搜索结果（Crossref / Europe PMC / arXiv / Wikipedia，配置 `BING_WEB_SEARCH_API_KEY` 后追加 Bing 网页搜索）。</sub></p>
 
 知识补全不是一张预先写死的“标准答案知识树”。它把地图定义成：**在某个用户目标、受众、粒度、扩展跳数、节点预算和证据阈值下，对当前输入笔记所做的一次可审计建模**。
 
@@ -55,6 +55,8 @@ npm run dev
 产品地址：<http://localhost:4318>
 
 不要直接双击 HTML 文件。产品包含 API、D1 持久化和动态路由，必须由 `npm run dev` 或正式部署运行。
+
+**网页端直接创建 Run（无需 CLI）**：打开首页 <http://localhost:4318>，在顶部表单粘贴任意笔记/话题，选择「知识颗粒度（1 领域 → 5 公式实现）」与「扩散跳数（1–3）」，点击「生成知识网络」即可。配置了模型后走真实 LLM 多跳扩散；未配置则用离线提取。首页会实时显示「真实模型已接入」或「离线提取模式」。
 
 ### 1.2.1 让 Run API 调用真实模型（可选，已实测）
 
@@ -201,7 +203,7 @@ cp -R knowledge-completion/plugins/knowledge-completion/skills/knowledge-complet
 | 动态前端 | `/runs/:runId` 只读取持久化结果；五级即时切换；2D 力布局；缩放、拖拽、复位；逐圈动画 | `app/runs/`、`AgentRunNetworkApp.tsx` |
 | 笔记交互 | 中心点代表起始笔记；悬停延迟卡片；点击 70% 大窗；展示所有输入笔记完整正文；离开自动收缩 | `AgentRunNetworkApp.tsx` |
 | 知识节点 | 亮色表示有证据，灰色表示未覆盖边界；悬停预览；点击查看概念、关系、可信度和证据 | 同上 |
-| 联网发现 | 概念详情中的联网搜索；右侧可滚动结果栏；Wikipedia、Crossref、Europe PMC、arXiv；去重、可信度和站内阅读 | `app/api/discovery/`、`apps/api/src/discovery-service.ts` |
+| 联网发现 | 概念详情中的联网搜索；右侧可滚动结果栏；Crossref、Europe PMC、arXiv、Wikipedia 多来源真实检索 + 可选 Bing Web Search（配置 `BING_WEB_SEARCH_API_KEY`）；去重、可信度和站内阅读 | `app/api/discovery/`、`apps/api/src/discovery-service.ts` |
 | 分发 | Codex Plugin 清单、marketplace、通用 Skill、Claude Code/Cursor 适配、严格 helper | `plugins/`、`.agents/`、`.claude/`、`.cursor/`、`skills/` |
 
 ### 4.2 明确没有伪装成已完成

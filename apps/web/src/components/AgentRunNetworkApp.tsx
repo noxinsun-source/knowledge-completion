@@ -71,6 +71,7 @@ const SOURCE_PROVIDER_LABELS: Record<ExternalKnowledgeSource["provider"], string
   arxiv: "arXiv",
   openalex: "OpenAlex",
   wikipedia: "Wikipedia",
+  bing: "Bing 搜索",
 };
 
 function clamp(value: number, minimum: number, maximum: number) {
