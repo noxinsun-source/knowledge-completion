@@ -30,7 +30,7 @@
 
 <p align="center"><b>真实 LLM 多源扩散测试（DeepSeek 实测，非模拟）：</b></p>
 
-<p align="center"><a href="public/demo/multisource-diffusion.gif"><img src="public/demo/multisource-diffusion.gif" width="100%" alt="真实 LLM 多源扩散：笔记/计划/文章片段/想法"></a><br><sub>从笔记 / 计划 / 文章片段 / 想法四类知识源头出发，DeepSeek 真实多跳扩散（每轮 trace、逐字证据；无笔记原文证据的候选 confidence ≤ 0.78）。扩散出的概念/关系/证据均由大模型真实生成。</sub></p>
+<p align="center"><a href="public/demo/multisource-diffusion.gif"><img src="public/demo/multisource-diffusion.gif" width="100%" alt="真实 LLM 多源扩散：笔记/计划/文章片段/想法"></a><br><sub>从笔记 / 计划 / 文章片段 / 想法四类知识源头出发，DeepSeek 真实多跳扩散（每轮 trace、逐字证据；无笔记原文证据的候选 confidence ≤ 0.78）。扩散出的概念/关系/证据均由大模型真实生成（下方为<b>真实 App 界面截图</b>，非手绘示意图）。</sub></p>
 
 <p align="center"><sub>以上四段均为真实录屏，由 DeepSeek `deepseek-chat`（`provider: openai-compatible:deepseek-chat`）真实生成知识网络。完整串联流程见 <a href="public/demo.gif">完整演示动图</a>。</sub></p>
 
