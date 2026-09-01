@@ -105,9 +105,34 @@ test("compiler rejects fabricated note evidence and repairs cyclic hierarchy dep
   assert.ok(fabricated);
   assert.equal(fabricated.coverage, "missing");
   assert.equal(fabricated.discoveryState, "boundary");
+  assert.equal(fabricated.confidence, 0.78);
   assert.equal(result.graph.evidence.find((item) => fabricated.evidenceIds.includes(item.id))?.sourceType, "model");
   assert.ok(result.graph.concepts.every((concept) => Number.isFinite(concept.depth)));
   assert.ok(result.graph.concepts.every((concept) => concept.depth <= 5));
+});
+
+test("compiler deterministically caps unsupported concept and relation confidence", async () => {
+  const note = await coffeeNote();
+  const draft: AgentGraphDraft = {
+    scope: "手冲咖啡萃取",
+    scopeDescription: "验证无证据候选的置信度闸门。",
+    concepts: [
+      { name: "手冲咖啡萃取", semanticType: "domain", granularity: 1, description: "目标领域", confidence: 1, evidence: [{ sourceNoteId: note.id, excerpt: "这份笔记记录如何稳定控制手冲咖啡的萃取" }] },
+      { name: "未验证流体假说", semanticType: "concept", granularity: 3, description: "模型提出但笔记未支持", parentNames: ["手冲咖啡萃取"], confidence: 0.99, evidence: [] },
+    ],
+    relations: [
+      { sourceName: "未验证流体假说", targetName: "手冲咖啡萃取", relation: "related_to", statement: "模型提出的未验证关系", confidence: 0.99, evidence: [] },
+    ],
+  };
+  const result = await runKnowledgeAgent({ notes: [note], goal: "验证置信度闸门", provider: createHeuristicKnowledgeModel(), initialDraft: draft });
+  const boundary = result.graph.concepts.find((concept) => concept.name === "未验证流体假说");
+  const relation = result.graph.relations.find((item) => item.statement === "模型提出的未验证关系");
+  assert.ok(boundary);
+  assert.equal(boundary.discoveryState, "boundary");
+  assert.equal(boundary.confidence, 0.78);
+  assert.ok(relation);
+  assert.equal(relation.confidence, 0.78);
+  assert.equal(relation.reviewState, "needs-review");
 });
 
 test("OpenAI-compatible adapter parses structured drafts without an SDK dependency", async () => {
