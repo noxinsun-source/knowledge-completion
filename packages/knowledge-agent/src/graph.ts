@@ -54,6 +54,29 @@ function noteContainsExcerpt(note: SourceNote | undefined, excerpt: string) {
   return core.length > 0 && note.content.includes(core);
 }
 
+const MAX_UNVERIFIED_CONFIDENCE = 0.78;
+
+function verifiedEvidenceCount(
+  items: DraftConcept["evidence"] | DraftRelation["evidence"],
+  noteById: Map<string, SourceNote>,
+) {
+  return (items ?? []).filter((item) =>
+    typeof item.excerpt === "string" &&
+    noteContainsExcerpt(noteById.get(item.sourceNoteId ?? ""), item.excerpt),
+  ).length;
+}
+
+function evidenceBoundedConfidence(
+  value: number,
+  items: DraftConcept["evidence"] | DraftRelation["evidence"],
+  noteById: Map<string, SourceNote>,
+) {
+  const normalized = clamp(Number.isFinite(value) ? value : 0, 0, 1);
+  return verifiedEvidenceCount(items, noteById)
+    ? normalized
+    : Math.min(normalized, MAX_UNVERIFIED_CONFIDENCE);
+}
+
 function mergeConcept(left: DraftConcept, right: DraftConcept): DraftConcept {
   const evidence = [...(left.evidence ?? []), ...(right.evidence ?? [])];
   const uniqueEvidence = new Map(
@@ -120,7 +143,7 @@ export function compileAgentGraph(
       description: concept.description.trim().slice(0, 800),
       whyItMatters: concept.whyItMatters?.trim().slice(0, 500),
       parentNames: (concept.parentNames ?? []).map((parent) => parent.trim()).filter(Boolean).slice(0, 6),
-      confidence: clamp(Number(concept.confidence), 0, 1),
+      confidence: evidenceBoundedConfidence(Number(concept.confidence), concept.evidence, noteById),
       granularity: clamp(Math.round(Number(concept.granularity)), 1, 5) as MapGranularity,
     };
     const existing = mergedConcepts.get(key);
@@ -152,13 +175,13 @@ export function compileAgentGraph(
     .sort(([leftKey, left], [rightKey, right]) => {
       if (leftKey === domainKey) return -1;
       if (rightKey === domainKey) return 1;
-      const leftEvidence = left.evidence?.length ?? 0;
-      const rightEvidence = right.evidence?.length ?? 0;
+      const leftEvidence = verifiedEvidenceCount(left.evidence, noteById);
+      const rightEvidence = verifiedEvidenceCount(right.evidence, noteById);
       return rightEvidence - leftEvidence || right.confidence - left.confidence || left.granularity - right.granularity;
     })
     .filter(([key, concept]) =>
       key === domainKey ||
-      Boolean(concept.evidence?.length) ||
+      verifiedEvidenceCount(concept.evidence, noteById) > 0 ||
       concept.confidence >= Math.max(0.45, confidenceThreshold - 0.12),
     )
     .slice(0, maxNodes);
@@ -267,7 +290,7 @@ export function compileAgentGraph(
     const sourceId = idByKey.get(sourceKey)!;
     const targetId = idByKey.get(targetKey)!;
     if (sourceId === targetId) continue;
-    const confidence = clamp(Number(relation.confidence), 0, 1);
+    const confidence = evidenceBoundedConfidence(Number(relation.confidence), relation.evidence, noteById);
     if (confidence < Math.max(0.35, confidenceThreshold - 0.22)) continue;
     const relationEvidenceIds = (relation.evidence ?? []).flatMap((item) => {
       const sourceNoteId = item.sourceNoteId ?? "model-proposal";
